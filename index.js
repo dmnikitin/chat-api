@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const port = process.env.PORT || 8000;
+const jwt = require('jsonwebtoken');
+const { SECRET: secret } = dotenv.config().parsed;
 
 const app = express();
 app.use(cors())
@@ -52,6 +54,21 @@ app.post('/signup', (req, res, next) => {
 
 
 //auth
+const authMiddleware = (req, res, next) => {
+    const [prefix, token] = req.headers.authorization.split(' ');
+    if (prefix === 'Bearer') {
+        // jwt.verify (token, callback func (verified) => {}
+        // req.verified = verified
+        //next()
+    } else {
+        //error access denied 403
+    }
+}
+
+
+app.get('/', authMiddleware, (req, res) => {
+
+})
 
 
 //logout
