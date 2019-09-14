@@ -67,7 +67,10 @@ const authMiddleware = (req, res, next) => {
 
 
 app.get('/', authMiddleware, (req, res) => {
-
+    // if user
+    return Promise.resolve({ user: req.verified.user })
+        .then(json => res.json({ success: true, user: json.user }))
+        .catch(err => console.log(err.message))
 })
 
 
