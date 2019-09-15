@@ -97,28 +97,8 @@ app.post('/login', (req, res, next) =>
 
 //auth
 
-const authMiddleware = (req, res, next) => {
-    if (req.headers.authorization) {
-        const [prefix, token] = req.headers.authorization.split(' ');
-        if (prefix === 'Bearer') {
-            jwt.verify(token, secret, (error, verified) => {
-                if (error) {
-                    res.status(403).send({
-                        success: false,
-                        error: 'failed to verify token'
-                    });
-                }
-                req.verified = verified;
-                next();
-            })
-        } else {
-            res.status(403).send({
-                success: false,
-                message: 'failed to authenticate: token required',
-            });
-        }
-    }
-}
+const { authMiddleware } = require('./middlewares/index')
+
 
 app.get('/', authMiddleware, (req, res) =>
     Promise.resolve({ user: req.verified.user })
