@@ -45,19 +45,15 @@ const getDate = date => {
 //signup handler
 
 app.post('/signup', (req, res, next) => {
-    //1_validate req data
     requestUserCheck(req)
-        //2_ get from mongo
         .then(json => getFromMongo(User, { username: json.username }))
-        //3_if no user in mongo - create one
         .then(user => {
             if (!user) {
-                // todo: const registrationDate  - create func for date
-                // create User mongo model
+                const registrationDate = getDate(new Date())
                 const newUser = new User({
                     username: req.body.user.username,
                     password: req.body.user.password,
-                    //registrationDate
+                    registrationDate,
                 })
                 return newUser.save();
             }
@@ -75,8 +71,23 @@ app.post('/signup', (req, res, next) => {
 
 //login
 
+app.post('/login', (req, res, next) =>
+    requestUserCheck(req)
+    .then(user => getFromMongo(User, { username: user.username }))
+    .then(user => user
+        // check if req password === mongodb password for req user
+        ? isCorrectPassword(req, user)
+        : Promise.reject({ message: 'Failed to login. Wrong username or password' }))
+    .then(user => {
+        // jwt.sign
+        // return ({ user, token} )
+    })
+    .then(json => res.json({ success: true, user: json.user, token: json.token }))
+    .catch(err => errorHandler(err, res, next)))
+
 
 //auth
+
 const authMiddleware = (req, res, next) => {
     if (req.headers.authorization) {
         const [prefix, token] = req.headers.authorization.split(' ');
