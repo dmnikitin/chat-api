@@ -31,6 +31,17 @@ const getFromMongo = (model, options) => {
     return query.exec();
 }
 
+// date func
+
+const getDate = date => {
+    const dd = date.getDate();
+    const mm = date.getMonth() + 1;
+    const formattedMonth = (`0${mm}`).slice(-2);
+    const formattedDay = (`0${dd}`).slice(-2);
+    const yyyy = date.getFullYear();
+    return `${formattedDay}.${formattedMonth}.${yyyy}`;
+};
+
 //signup handler
 
 app.post('/signup', (req, res, next) => {
