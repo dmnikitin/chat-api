@@ -1,7 +1,6 @@
 const Message = require('../models/messageModel');
 const { errorHandler, getFromMongo, getDate } = require('../helpers/index');
 
-
 const requestMessageCheck = req => {
     const { username, message } = req.body.message;
     if (username && message) {
@@ -17,6 +16,12 @@ const addMessageController = (req, res, next) =>
         return newMessage.save()
     })
     .then(() => getFromMongo(Message))
+    .then(messages => messages && messages.length ? messages : Promise.reject({ message: 'There is no messages yet' }))
+    .then(messages => res.json({ success: true, messages }))
+    .catch(err => errorHandler(err, res, next))
+
+const getMessagesController = (req, res, next) =>
+    getFromMongo(Message)
     .then(messages => messages && messages.length ? messages : Promise.reject({ message: 'There is no messages yet' }))
     .then(messages => res.json({ success: true, messages }))
     .catch(err => errorHandler(err, res, next))
