@@ -5,7 +5,6 @@ const port = process.env.PORT || 8000;
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-
 const app = express();
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,8 +15,7 @@ const { SECRET: secret } = dotenv.config().parsed;
 const User = require('./models/usersModel')
 
 
-
-//validator
+//input validator
 const requestUserCheck = req => {
     const { username, password } = req.body.user;
     if (username && password) {
@@ -41,6 +39,13 @@ const getDate = date => {
     const yyyy = date.getFullYear();
     return `${formattedDay}.${formattedMonth}.${yyyy}`;
 };
+
+//password validator
+
+const isCorrectPassword = (req, user) =>
+    bcrypt.compare(req.body.user.password, user.password)
+    .then(result => result ? user : null)
+
 
 //signup handler
 
@@ -71,10 +76,6 @@ app.post('/signup', (req, res, next) => {
 
 //login
 
-const isCorrectPassword = (req, user) =>
-    bcrypt.compare(req.body.user.password, user.password)
-    .then(result => result ? user : null)
-
 app.post('/login', (req, res, next) =>
     requestUserCheck(req)
     .then(user => getFromMongo(User, { username: user.username }))
@@ -82,12 +83,15 @@ app.post('/login', (req, res, next) =>
         ? isCorrectPassword(req, user)
         : Promise.reject({ message: 'Failed to login. Wrong username or password' }))
     .then(user => {
-        // jwt.sign
-        // return ({ user, token} )
+        if (user) {
+            // const userObjWithoutPassword = { id: user.id, username: user.username, registrationDate: user.registrationDate };
+            req.token = jwt.sign({ user }, secret, { expiresIn: '24h' });
+            return ({ user, token: req.token });
+        }
+        return Promise.reject({ message: 'Failed to login. Wrong username or password' });
     })
     .then(json => res.json({ success: true, user: json.user, token: json.token }))
     .catch(err => errorHandler(err, res, next)))
-
 
 //auth
 
