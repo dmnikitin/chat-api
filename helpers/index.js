@@ -25,4 +25,12 @@ const isCorrectPassword = (req, user) =>
     bcrypt.compare(req.body.user.password, user.password)
     .then(result => result ? user : null)
 
-module.exports = { getDate, requestUserCheck, getFromMongo, isCorrectPassword };
+
+const errorHandler = (err, res, next) => {
+    console.log('error handler', err)
+    res.json({ success: false, message: err.message });
+    // next : controller будет пропущен в express.router
+    next(err);
+}
+
+module.exports = { getDate, requestUserCheck, getFromMongo, isCorrectPassword, errorHandler };

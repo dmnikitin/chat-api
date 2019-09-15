@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/usersModel');
-const { getDate, requestUserCheck, getFromMongo, isCorrectPassword } = require('../helpers/index');
+const { getDate, requestUserCheck, getFromMongo, isCorrectPassword, errorHandler } = require('../helpers/index');
 const { SECRET: secret } = dotenv.config().parsed;
 
 const signupController = (req, res, next) =>
@@ -25,7 +25,7 @@ const signupController = (req, res, next) =>
             message: 'User has been successfully registered'
         })
         : Promise.reject({ message: 'Failed to register' }))
-    .catch(err => console.log(err.message))
+    .catch(err => errorHandler(err, res, next))
 
 
 const loginController = (req, res, next) =>
@@ -49,13 +49,13 @@ const loginController = (req, res, next) =>
 const authController = (req, res) =>
     Promise.resolve({ user: req.verified.user })
     .then(json => res.json({ success: true, user: json.user }))
-    .catch(err => console.log(err.message))
+    .catch(err => errorHandler(err, res, next))
 
 
 const logoutController = (req, res, next) =>
     Promise.resolve({ message: 'Logged out successfully' })
     .then(json => res.json({ success: true, message: json.message }))
-    .catch(err => console.log(err.message))
+    .catch(err => errorHandler(err, res, next))
 
 
 module.exports = { authController, loginController, signupController, logoutController }
