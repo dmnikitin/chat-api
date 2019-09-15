@@ -71,11 +71,14 @@ app.post('/signup', (req, res, next) => {
 
 //login
 
+const isCorrectPassword = (req, user) =>
+    bcrypt.compare(req.body.user.password, user.password)
+    .then(result => result ? user : null)
+
 app.post('/login', (req, res, next) =>
     requestUserCheck(req)
     .then(user => getFromMongo(User, { username: user.username }))
     .then(user => user
-        // check if req password === mongodb password for req user
         ? isCorrectPassword(req, user)
         : Promise.reject({ message: 'Failed to login. Wrong username or password' }))
     .then(user => {
