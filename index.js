@@ -14,6 +14,7 @@ mongoose.connect(MONGO_URI);
 const { SECRET: secret } = dotenv.config().parsed;
 const User = require('./models/usersModel')
 
+const bcrypt = require('bcrypt');
 
 //input validator
 const requestUserCheck = req => {
