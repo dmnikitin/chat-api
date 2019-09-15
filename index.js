@@ -9,9 +9,10 @@ const app = express();
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-mongoose.connect(MONGO_URI);
 
+const { MONGO_URI } = dotenv.config().parsed;
 const { SECRET: secret } = dotenv.config().parsed;
+mongoose.connect(MONGO_URI);
 const User = require('./models/usersModel')
 
 const bcrypt = require('bcrypt');
