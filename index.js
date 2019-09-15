@@ -3,12 +3,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const port = process.env.PORT || 8000;
 const jwt = require('jsonwebtoken');
-const { SECRET: secret } = dotenv.config().parsed;
+
 
 const app = express();
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+const { SECRET: secret } = dotenv.config().parsed;
+const User = require('./models/usersModel')
+
 
 
 //validator
@@ -55,23 +59,33 @@ app.post('/signup', (req, res, next) => {
 
 //auth
 const authMiddleware = (req, res, next) => {
-    const [prefix, token] = req.headers.authorization.split(' ');
-    if (prefix === 'Bearer') {
-        // jwt.verify (token, callback func (verified) => {}
-        // req.verified = verified
-        //next()
-    } else {
-        //error access denied 403
+    if (req.headers.authorization) {
+        const [prefix, token] = req.headers.authorization.split(' ');
+        if (prefix === 'Bearer') {
+            jwt.verify(token, secret, (error, verified) => {
+                if (error) {
+                    res.status(403).send({
+                        success: false,
+                        error: 'failed to verify token'
+                    });
+                }
+                req.verified = verified;
+                next();
+            })
+        } else {
+            res.status(403).send({
+                success: false,
+                message: 'failed to authenticate: token required',
+            });
+        }
     }
 }
 
-
-app.get('/', authMiddleware, (req, res) => {
-    // if user
-    return Promise.resolve({ user: req.verified.user })
-        .then(json => res.json({ success: true, user: json.user }))
-        .catch(err => console.log(err.message))
-})
+app.get('/', authMiddleware, (req, res) =>
+    Promise.resolve({ user: req.verified.user })
+    .then(json => res.json({ success: true, user: json.user }))
+    .catch(err => console.log(err.message))
+)
 
 
 //logout
