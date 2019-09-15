@@ -97,6 +97,10 @@ app.get('/', authMiddleware, (req, res) =>
 
 
 //logout
+app.get('/logout', (req, res, next) =>
+    Promise.resolve({ message: 'Logged out successfully' })
+    .then(json => res.json({ success: true, message: json.message }))
+    .catch(err => errorHandler(err, res, next)))
 
 
 
