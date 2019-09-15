@@ -1,14 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-
-//to env file
-const port = process.env.PORT || 8000;
-
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const { MONGO_URI } = dotenv.config().parsed;
+const { MONGO_URI, port } = dotenv.config().parsed;
 
+const routes = require('./routes/index');
 const { authController, loginController, signupController, logoutController } = require('../controllers/authControllers');
 const { authMiddleware } = require('./middlewares/index')
 
@@ -19,10 +16,6 @@ app.use(bodyParser.json());
 
 mongoose.connect(MONGO_URI);
 
-
-app.post('/signup', signupController)
-app.post('/login', loginController)
-app.get('/', authMiddleware, authController)
-app.get('/logout', logoutController)
+app.use('/', routes);
 
 app.listen(port, () => console.log(`Listening on http://localhost:${port}/`))
