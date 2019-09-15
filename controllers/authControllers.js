@@ -46,7 +46,7 @@ const loginController = (req, res, next) =>
     .catch(err => errorHandler(err, res, next))
 
 
-const authController = (req, res) =>
+const authController = (req, res, next) =>
     Promise.resolve({ user: req.verified.user })
     .then(json => res.json({ success: true, user: json.user }))
     .catch(err => errorHandler(err, res, next))
