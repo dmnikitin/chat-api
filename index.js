@@ -3,12 +3,14 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const port = process.env.PORT || 8000;
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 
 const app = express();
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+mongoose.connect(MONGO_URI);
 
 const { SECRET: secret } = dotenv.config().parsed;
 const User = require('./models/usersModel')
@@ -22,6 +24,12 @@ const requestUserCheck = req => {
         return Promise.resolve({ username, password })
     }
 };
+
+// data from db
+const getFromMongo = (model, options) => {
+    let query = options ? model.findOne(options) : model.find({});
+    return query.exec();
+}
 
 //signup handler
 
