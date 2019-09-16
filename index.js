@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const io = require('socket.io');
 
+const { socketHandler } = require('./controllers/socketsController');
 const routes = require('./routes/index');
 
 const app = express();
@@ -15,6 +16,7 @@ const { MONGO_URI, port } = dotenv.config().parsed;
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(socketHandler(io))
 app.use('/', routes);
 
 mongoose.set('useNewUrlParser', true);
@@ -22,7 +24,6 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect(MONGO_URI);
-
 
 io.listen(server);
 app.listen(port, () => console.log(`Listening on http://localhost:${port}/`))
