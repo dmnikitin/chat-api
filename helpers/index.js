@@ -16,13 +16,6 @@ const requestUserCheck = req => {
     }
 };
 
-const requestMessageCheck = req => {
-    const { username, message } = req.body.message;
-    if (username && message) {
-        return Promise.resolve({ username, message })
-    }
-};
-
 const getFromMongo = (model, options) => {
     let query = options ? model.findOne(options) : model.find({});
     return query.exec();
@@ -40,4 +33,4 @@ const errorHandler = (err, res, next) => {
     next(err);
 }
 
-module.exports = { getDate, requestUserCheck, requestMessageCheck, getFromMongo, isCorrectPassword, errorHandler };
+module.exports = { getDate, requestUserCheck, getFromMongo, isCorrectPassword, errorHandler };
