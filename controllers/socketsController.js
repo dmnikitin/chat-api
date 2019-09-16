@@ -1,4 +1,4 @@
-const { socketMiddleware } = require('../middlewares/authMiddleware');
+const { socketMiddleware } = require('../middlewares/index');
 const { addMessageController } = require('./messagesControllers');
 
 const socketHandler = io => {
