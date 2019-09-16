@@ -8,21 +8,30 @@ const authMiddleware = (req, res, next) => {
         if (prefix === 'Bearer') {
             jwt.verify(token, secret, (error, verified) => {
                 if (error) {
-                    res.status(403).send({
-                        success: false,
-                        error: 'failed to verify'
-                    });
+                    return next(new Error('authentication error'))
                 }
                 req.verified = verified;
                 next();
             })
-        } else {
-            res.status(403).send({
-                success: false,
-                message: 'failed to authenticate: token verification required',
-            });
         }
+    } else {
+        return next(new Error('authentication error'))
     }
 }
 
-module.exports = { authMiddleware }
+const socketMiddleware = (socket, next) => {
+    const token = socket.handshake.query.token;
+    if (!token) {
+        return next(new Error('authentication error'))
+    } else {
+        jwt.verify(token, secret, (err, verified) => {
+            if (err) {
+                return next(new Error('authentication error'))
+            }
+            socket.verified = verified;
+            next();
+        });
+    }
+}
+
+module.exports = { authMiddleware, socketMiddleware };
